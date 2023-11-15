@@ -12,11 +12,11 @@ for title in titles:
     print(title.string)
 book_url = soup.find('a')['href']
  #Prints only the jpg we need
-images = soup.find_all('img', {'src' : True})
-for img in images:
-    if img['src'].endswith('15c9.jpg'):
+#images = soup.find_all('img', {'src' : True})
+#for img in images:
+ #   if img['src'].endswith('15c9.jpg'):
 
-soup = BeautifulSoup(response.text, 'html.parser')
+#soup_one = BeautifulSoup(response.text, 'html.parser')
 # uploaded soup and pulled in science-fiction category page data
 def soup_func(url):
     response = requests.get(url)
@@ -37,7 +37,7 @@ def category_link():
             link = item.find('a', href=True)
             if link is not None:
                 print(link['href'])
-        return category_request
+        return category_requests
 
 def get_titles(url):
     Book_title_tags = soup.find_all('h3')
@@ -63,62 +63,53 @@ def extract_book_links(soup):
         book_links.append(f'https://books.toscrape.com/catalogue/{tag.contents[0]['href'].replace("../../../","")}')
 #extracts all html code for scifi page
     next_page = soup.find(('li'), class_ = "next")
-    if next_page:
-        url_page = next_page.get('href')
-        page += 1
-    else:
-        breakpoint()
+   # if next_page:
+    #    url_page = next_page.get('href')
+     #   page += 1
+    #lse:
+     #   breakpoint()
 
 #pulls in titles
-book_info_type = soup.find_all('th')
-upc_name = soup.find('table', class_ = "table table-striped").find_all ('th') [0].text.strip()
-product_type_name = soup.find('table', class_ = "table table-striped").find_all ('th') [1].text.strip()
-price_exc_tax_name = soup.find('table', class_ = "table table-striped").find_all ('th') [2].text.strip()
-price_inc_tax_name = soup.find('table', class_ = "table table-striped").find_all ('th') [3].text.strip()
-tax_name = soup.find('table', class_ = "table table-striped").find_all ('th') [4].text.strip()
-Availability_name = soup.find('table', class_ = "table table-striped").find_all ('th') [5].text.strip()
-Num_reviews_name = soup.find('table', class_ = "table table-striped").find_all ('th') [6].text.strip()
-#headers, obtained from product info chart
+#if response == 200:
+ #   soup = BeautifulSoup(response.content, "html.parser")
 
+def product_information(url):
+    book_data = url.find_all('td')
+    book_price = url.find('p', class_ = 'price_color').text.strip()
+    book_rating = url.find('p', class_ = 'star-rating Five').text.strip()
 
-    if response == 200:
-        soup = BeautifulSoup(response.content, "html.parser")
+    book_availability = url.find('p', class_ = 'availability').text.strip()
 
-#book_data = soup.find_all('td')
+    product_description = url.find('article', class_ = "product_page").find_all('p').text.strip()
 #individual product info values
-upc_data = soup.find('table', class_ = "table table-striped").find_all ('td') [0].text.strip()
-product_type_data = soup.find('table', class_ = "table table-striped").find_all ('td') [1].text.strip()
-Price_exc_tax_data = soup.find('table', class_ = "table table-striped").find_all ('td') [2].text.strip()
-price_inc_tax_data = soup.find('table', class_ = "table table-striped").find_all ('td') [3].text.strip()
-tax_data = soup.find('table', class_ = "table table-striped").find_all ('td') [4].text.strip()
-availability_data = soup.find('table', class_ = "table table-striped").find_all ('td') [5].text.strip()
-num_reviews_data = soup.find('table', class_ = "table table-striped").find_all ('td') [6].text.strip()
+    upc_data = url.find('table', class_ = "table table-striped").find_all ('td') [0].text.strip()
+    product_type_data = url.find('table', class_ = "table table-striped").find_all ('td') [1].text.strip()
+    Price_exc_tax_data = url.find('table', class_ = "table table-striped").find_all ('td') [2].text.strip()
+    price_inc_tax_data = url.find('table', class_ = "table table-striped").find_all ('td') [3].text.strip()
+    tax_data = url.find('table', class_ = "table table-striped").find_all ('td') [4].text.strip()
+    availability_data = url.find('table', class_ = "table table-striped").find_all ('td') [5].text.strip()
+    num_reviews_data = url.find('table', class_ = "table table-striped").find_all ('td') [6].text.strip()
 #print(upc_data, product_type_data, price_inc_tax_data,Price_exc_tax_data,tax_data, availability_data, num_reviews_data)
 
-headers = [page, "Title", "Description", book_rating, book_availability, upc_name, product_type_name,
-           price_exc_tax_name, price_inc_tax_name, tax_name,
-           Availability_name, Num_reviews_name]
+    headers = ["page", "Title", "Description", "book_rating", "book_availability", "upc", "product_type",
+           "price_exc_tax_name", "price_inc_tax_name", "tax",
+           "Availability_name", "Num_reviews_name"]
 #print(headers)
-row_data = [page, title.string, product_description, book_rating, book_availability, upc_data, product_type_data, Price_exc_tax_data, price_inc_tax_data, tax_data,
+    row_data = [page, title.string, product_description, book_rating, book_availability, upc_data, product_type_data, Price_exc_tax_data, price_inc_tax_data, tax_data,
             availability_data, num_reviews_data][0:12]
-dict = ({"Title" : title, "Description" : product_description, book_rating : book_rating,
-        book_availability : [availability_data], upc_name : [upc_data], product_type_name : [product_type_data],
-        price_exc_tax_name : [Price_exc_tax_data], price_inc_tax_name : [price_inc_tax_data], tax_name : [tax_data],
-        Availability_name : [availability_data], Num_reviews_name : [num_reviews_data]})
-df = pd.DataFrame(dict)
-df
-df.to_csv('data_attempt.csv')
+    dict = ({"Title" : title, "Description" : product_description, "book_rating" : book_rating,
+        'book_availability' : [availability_data], 'upc' : [upc_data], 'product_type' : [product_type_data],
+        'price_exc_tax_name' : [Price_exc_tax_data], 'price_inc_tax_name' : [price_inc_tax_data], 'tax_name' : [tax_data],
+        'Availability_name' : [availability_data], 'Num_reviews_name' : [num_reviews_data]})
 
-
-
-        print(book_information())
+    return(dict)
 
 def info_from_category(urls):
     info = []
     for link in urls:
-        book_info = book_information(urls)
+        book_info = 'book_information'(urls)
         info.append(book_info)
 
-        write_csv(urls, book_info['category'])
+
     return urls
-    print(info_from_category())
+  #  print(info_from_category(url))
